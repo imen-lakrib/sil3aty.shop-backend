@@ -4,30 +4,28 @@ import Features from "../utils/Features.js";
 
 const controller = {
     GetProducts: async (req, res) => {
-        //use features to filtre product
         const features = Features(Product, req.query);
         try {
-
-            // instead to use this: const products = await Product.find() we gonna use our custome function
             const searchResults = await features.search();
             const filteredResults = await features.filter();
-
-            const productIds = searchResults.map((product) => product._id.toString());
-            const products = filteredResults.filter((product) => productIds.includes(product._id.toString()));
-
-            console.log('searchResults:', searchResults);
-            console.log('filteredResults:', filteredResults);
-            console.log('products:', products);
-
-            if (!products) {
-                return res.status(404).json({ message: "there is no product" })
+            const paginatedResults = await features.paginate(filteredResults.filter((product) => searchResults.map((product) => product._id.toString()).includes(product._id.toString())));
+          
+            if (paginatedResults.results.length === 0) {
+              return res.status(404).json({ message: "No products found" });
             }
-            res.status(200).json({ products })
+          
+            res.status(200).json({
+              products: paginatedResults.results,
+              pagination: paginatedResults.pagination,
+            });
         } catch (error) {
-            console.log(error)
-            res.sendStatus(500)
+            console.log(error);
+            res.sendStatus(500);
         }
     },
+
+
+
     CreateProduct: async (req, res) => {
         try {
             if (!req.body.name || !req.body.description || !req.body.price) {
