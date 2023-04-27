@@ -15,20 +15,23 @@ var controller = {
     registerUser: async (req, res) => {
         try {
             const { email, password, username, role } = req.body
-            if (!email || !password || !username) {
-                return res.status(400).json({ message: 'please add all fields' })
-            }
-            // check if user exists : 
-            const userExists = await User.findOne({ email })
-            if (userExists) {
-                return res.status(400).json({ message: 'user already exists' })
-            }
-            // Hash password : 
-            const salt = await bcrypt.genSalt(10)
-            const hashedPassword = await bcrypt.hash(password, salt)
 
-            // create user : 
-            const user = await User.create({
+            // Validate request parameters
+            if (!email || !password || !username) {
+                return res.status(400).json({ message: 'Please provide all required fields.' });
+            }
+
+            // Check if user already exists
+            const user = await User.findOne({ email });
+            if (user) {
+                return res.status(400).json({ message: 'User already exists with this email.' });
+            }
+
+            // Hash password and create user
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(password, salt);
+
+            const newUser = new User({
                 email,
                 password: hashedPassword,
                 username,
@@ -37,8 +40,10 @@ var controller = {
                     url: "http://www.example.com"
                 },
                 role
-            })
-            res.status(201).json({ message: `you are created a new user: ${user}` })
+            });
+            await newUser.save();
+
+            res.status(201).json({ message: `You have successfully created a new user with email: ${newUser.email}` });
 
         } catch (error) {
             console.log(error)
@@ -57,18 +62,18 @@ var controller = {
                 console.log('User not found')
                 return res.status(400).json({ message: "invalid user" })
             }
-            
+
             console.log('User', user, user.email, user._id)
-            
+
             const isCorrect = await bcrypt.compare(password, user.password)
-            
+
             if (!isCorrect) {
                 console.log('Invalid password')
                 return res.status(400).json({ message: "invalid password" })
             }
-            
+
             console.log('User logged in', user, user.email, user._id)
-            
+
             res.status(200).json({
                 email: user.email,
                 token: generateJwt({
@@ -76,7 +81,7 @@ var controller = {
                     id: user._id,
                 })
             })
-            
+
             console.log('User logged in', user, user.email, user._id)
 
         }
@@ -84,6 +89,23 @@ var controller = {
             console.log(err)
             res.sendStatus(500)
         }
+    },
+    GetUser: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const user = await User.findById(id);
+
+            if (!user) {
+                return res.status(404).json({ message: `User with ID ${id} not found` });
+            }
+
+            res.status(200).json(user);
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ message: "Internal server error" });
+        }
+
+
     },
     LogoutUser: (req, res) => {
         try {
@@ -117,22 +139,22 @@ var controller = {
         try {
             const { email } = req.body;
             const user = await User.findOne({ email });
-        
+
             if (!user) {
-              return res.status(404).json({ message: 'User not found' });
+                return res.status(404).json({ message: 'User not found' });
             }
-        
+
             // Generate a new password reset token and update the user's record
             const resetToken = crypto.randomBytes(20).toString('hex');
             user.passwordResetToken = resetToken;
             user.passwordResetExpires = Date.now() + 3600000; // 1 hour
             await user.save();
-        
+
             // Send the password reset email with the new token
             const resetUrl = `http://${req.headers.host}/reset-password/${resetToken}`;
             const message = `Hi ${user.username},\n\nWe received a request to reset your password. Please click the link below to create a new password:\n\n${resetUrl}\n\nThis link will expire in 1 hour.\n\nIf you did not request a password reset, please ignore this email.\n\nBest regards,\nYour App Name`;
             await SendEmail({ to: user.email, subject: 'Password Reset', text: message });
-        
+
             res.status(200).json({ message: 'Password reset email sent.' });
 
 
@@ -141,9 +163,9 @@ var controller = {
             res.sendStatus(500);
         }
     },
-// new page on your website where they can enter a new password.
-// This page should validate the token in the URL and confirm that it is still valid (i.e., it hasn't expired).
-    ResetPassword: async(req,res)=>{
+    // new page on your website where they can enter a new password.
+    // This page should validate the token in the URL and confirm that it is still valid (i.e., it hasn't expired).
+    ResetPassword: async (req, res) => {
         try {
             const { token } = req.params;
             console.log(token)
@@ -151,47 +173,120 @@ var controller = {
 
             console.log(user)
             if (!user) {
-              return res.status(400).json({ message: 'Invalid or expired token' });
+                return res.status(400).json({ message: 'Invalid or expired token' });
             }
-        
+
             // Render the password reset form
             res.render('reset-password', { token });
         } catch (error) {
             console.log(error);
             res.sendStatus(500);
-            
+
         }
     },
-    SubmitResetPassword:async(req,res)=>{
+    SubmitResetPassword: async (req, res) => {
         try {
             const { token } = req.params;
             const { password } = req.body;
             const user = await User.findOne({ passwordResetToken: token, passwordResetExpires: { $gt: Date.now() } });
-        
+
             if (!user) {
-              return res.status(400).json({ message: 'Password reset token is invalid or has expired.' });
+                return res.status(400).json({ message: 'Password reset token is invalid or has expired.' });
             }
-        
+
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(password, salt);
-        
+
             user.password = hashedPassword;
             user.passwordResetToken = undefined;
             user.passwordResetExpires = undefined;
             await user.save();
-        
+
             res.status(200).json({ message: 'Your password has been reset successfully.' });
-        
+
         } catch (error) {
             console.log(error);
             res.sendStatus(500);
-            
+
         }
 
+    },
+    GetAllUsers: async (req, res) => {
+        try {
+            const users = await User.find()
+            if (!users) {
+                res.status(400).json({ message: 'No users found' })
+            }
+            res.status(200).json(users)
+        } catch (error) {
+            console.log(error)
+            res.sendStatus(500)
+
+        }
+    },
+    EditProfileByAdmin: async (req, res) => {
+        try {
+            const user = await User.findById(req.params.id);
+            if (!user) {
+                return res.status(404).json({ message: "User not found" });
+            }
+
+            user.name = req.body.name || user.name;
+            user.email = req.body.email || user.email;
+            user.role = req.body.role || user.role;
+
+            const updatedUser = await user.save();
+
+            res.status(200).json(updatedUser);
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).send("Server Error");
+        }
+    },
+    EditMyProfile: async (req, res) => {
+
+        try {
+            const user = await User.findById(req.user.id);
+            if (!user) {
+                return res.status(404).json({ message: "User not found" });
+            }
+
+            user.name = req.body.name || user.name;
+            user.email = req.body.email || user.email;
+
+            const updatedUser = await user.save();
+
+            res.status(200).json(updatedUser);
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).send("Server Error");
+        }
+    },
+    ChangeRole:async(req,res)=>{
+        try {
+            const user = await User.findById(req.params.id);
+            if (!user) {
+                return res.status(404).json({ message: "User not found" });
+            }
+
+            user.role = req.body.role || user.role;
+
+            const updatedUser = await user.save();
+
+            res.status(200).json(updatedUser);
+            
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).send("Server Error");
+            
+        }
     }
 
-
 }
+
+
+
+
 
 
 export default controller
