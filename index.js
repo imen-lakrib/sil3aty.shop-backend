@@ -8,6 +8,10 @@ import connectDb from "./config/db.js"
 
 // import routes:
 import ProductRoute from './routes/Product.js'
+import UserRoute from './routes/User.js'
+
+
+
 dotenv.config();
 connectDb()
 
@@ -39,6 +43,7 @@ app.use(express.static(path.join(__dirname, "public"), { dotfiles: "allow" }));
 
 // create routes:
 app.use('/products',ProductRoute)
+app.use('/user',UserRoute)
 
 
 
