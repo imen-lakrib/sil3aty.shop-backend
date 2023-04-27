@@ -8,7 +8,14 @@ router.post('/register', UserController.registerUser)
 router.get('/login', UserController.loginUser)
 router.get('/logout',protectAllUsers, UserController.LogoutUser)
 router.delete('/:id',protectAdmin, UserController.DeleteUser)
+router.post('/forgot-password', UserController.ForgotPassword);
+router.get('/reset-password/:token', UserController.ResetPassword);
+router.post('/reset-password/:token', UserController.SubmitResetPassword);
 
+
+
+// change role : just for admin , allow shim to make any user as client or agent
+// get single user profile
 
 
 
