@@ -1,16 +1,15 @@
 import ErrorHandler from "../utils/ErrorHandler";
 
-function errorHandlerMiddleware(err, req, res, next) {
-    if (err instanceof ErrorHandler) {
-      res.status(err.statusCode).json({
-        message: err.message,
-      });
-    } else {
-      console.error(err);
-      res.status(500).json({
-        message: "Internal server error",
-      });
-    }
+export default function errorHandlerMiddleware(err, req, res, next){
+    const statusCode = err.statusCode || 500;
+    const message = err.message || "Internal Server Error";
+    res.status(statusCode).json({ message });
   }
+  
+  
+  
+  
+  
+  
+  
 
-  export default errorHandlerMiddleware
