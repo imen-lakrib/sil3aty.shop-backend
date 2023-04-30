@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-
 const WishListSchema = mongoose.Schema({
     productName: {
         type: String,
@@ -17,9 +16,10 @@ const WishListSchema = mongoose.Schema({
         type: Number,
         required: [true, "Please enter your product quantity"],
       },
-      userId: {
-        type: String,
-        required: [true, "Please enter your user id"],
+      user: {
+        type: mongoose.Schema.ObjectId,
+        ref: "User",
+        required: true,
       },
       productId:{
         type: String,

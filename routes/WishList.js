@@ -5,12 +5,16 @@ import { protectAdmin, protectAllUsers, protectClient, protectAgent } from "../m
 const router = express.Router()
 
 router.post('/add', protectClient, CartController.AddToWishList)
-router.get('/data', protectClient, CartController.GetWishList)
-router.delete('/remove/:id', protectClient, CartController.RemoveWishList)
+router.get('/wishlistdata', protectClient, CartController.GetWishList)
+
 router.post('/addtocart', protectClient, CartController.AddToCart)
-router.put('/updatecart/:id', protectClient, CartController.UpdateCart)
-router.get('/cart/data', protectClient, CartController.GetCartData)
+router.get('/data', protectClient, CartController.GetCartData)
+
 router.delete('/delete/:id', protectClient, CartController.DeleteCartData)
+router.put('/updatecart/:id', protectClient, CartController.UpdateCart)
+router.delete('/remove/:id', protectClient, CartController.RemoveWishList)
+
+
 
 
 

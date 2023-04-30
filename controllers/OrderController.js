@@ -1,12 +1,13 @@
 
+import mongoose from "mongoose";
 import Order from "../models/order.js";
 import Product from "../models/product.js";
 
 
 
-const UpdateStock=async(id, quantity)=>{
+const UpdateStock = async (id, quantity) => {
     const product = await Product.findById(id);
-    if(!product){
+    if (!product) {
         console.log("Product not found")
     }
 
@@ -27,6 +28,7 @@ const controller = {
                 taxPrice,
                 shippingPrice,
                 totalPrice,
+                orderStatus
             } = req.body;
 
             const newOrder = await Order.create({
@@ -39,6 +41,8 @@ const controller = {
                 totalPrice,
                 paidAt: Date.now(),
                 user: req.user._id,
+                orderStatus
+                
             });
             res.status(201).json({
                 success: true,
@@ -73,16 +77,23 @@ const controller = {
     GetAllOfMyOrders: async (req, res) => {
         try {
             const myOrders = await Order.find({ user: req.user._id });
-            if (!myOrders) {
-                res.status(404).json({ message: 'there is no order yet' })
+            console.log(myOrders)
+
+            if (!myOrders || myOrders.length === 0) {
+                res.status(404).json({ message: 'there is no order yet' });
+            } else {
+                res.status(200).json({
+                    success: true,
+                    myOrders
+                });
             }
-            res.status(200).json({
-                success: true,
-                myOrders
-            });
 
         } catch (error) {
-            res.status(500).json({ message: error });
+            if (error instanceof mongoose.Error.CastError) {
+                res.status(400).json({ message: "Invalid user ID" });
+            } else {
+                res.status(500).json({ message: "Internal server error" });
+            }
         }
     },
     /////////////////////////////// Admin API /////////////////////////////////
@@ -90,20 +101,21 @@ const controller = {
     AdminGetAllOrders: async (req, res) => {
         try {
             const orders = await Order.find();
-
+        
             let totalAmount = 0;
-
+        
             orders.forEach((order) => {
-                totalAmount += order.totalPrice;
+              totalAmount += order.totalPrice;
             });
-
+        
             res.status(200).json({
-                success: true,
-                totalAmount,
-                orders
+              success: true,
+              totalAmount,
+              orders,
             });
 
         } catch (error) {
+            console.log(error)
             res.status(500).json({ message: error });
         }
     },
@@ -127,9 +139,9 @@ const controller = {
                     await UpdateStock(o.product, o.quantity);
                 });
             }
-            order.orderStatus = req.body.status;
+            order.orderStatus = req.body.orderStatus;
 
-            if (req.body.status === "Delivered") {
+            if (req.body.orderStatus === "Delivered") {
                 order.deliveredAt = Date.now();
             }
 
@@ -142,26 +154,28 @@ const controller = {
             res.status(500).json({ message: error });
         }
     },
-    
+
 
     // delete Order ---Admin
 
     DeleteOrder: async (req, res) => {
         try {
             const order = await Order.findById(req.params.id);
+            console.log(order)
 
             if (!order) {
                 return res.status(404).json({ message: 'order not found' })
             }
 
-            await order.remove();
+            await order.deleteOne({ _id: req.params.id })
 
             res.status(200).json({
                 success: true,
             });
 
         } catch (error) {
-            res.status(500).json({ message: error });
+            console.log(error);
+            res.status(500).json({ message: 'Server error' });
 
         }
     }

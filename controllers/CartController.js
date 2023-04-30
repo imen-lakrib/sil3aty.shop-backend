@@ -9,7 +9,6 @@ const controller = {
                 quantity,
                 productImage,
                 productPrice,
-                userId,
                 productId,
                 Stock,
             } = req.body;
@@ -18,7 +17,7 @@ const controller = {
                 quantity,
                 productImage,
                 productPrice,
-                userId,
+                user: req.user._id,
                 productId,
                 Stock,
             });
@@ -35,7 +34,7 @@ const controller = {
     // get wishlistData Data
     GetWishList: async (req, res) => {
         try {
-            const wishlistData = await WishList.find({ userId: req.user.id });
+            const wishlistData = await WishList.find({ user: req.user.id });
             if (!wishlistData) {
                 res.status(404).json({ message: "not found" })
             }
@@ -58,8 +57,7 @@ const controller = {
                 res.status(404).json({ message: "not found" })
 
             }
-
-            await wishlistData.remove();
+            await wishlistData.deleteOne({ _id: req.params.id });
 
             res.status(200).json({
                 success: true,
@@ -67,6 +65,7 @@ const controller = {
             });
 
         } catch (error) {
+            console.log(error)
             res.status(500).json({ message: error });
         }
     },
@@ -78,7 +77,6 @@ const controller = {
                 quantity,
                 productImage,
                 productPrice,
-                userId,
                 productId,
                 Stock,
             } = req.body;
@@ -87,8 +85,8 @@ const controller = {
                 quantity,
                 productImage,
                 productPrice,
-                userId,
                 productId,
+                user: req.user._id,
                 Stock,
             });
 
@@ -104,27 +102,29 @@ const controller = {
     // update Cart
     UpdateCart: async (req, res) => {
         try {
-            const {
-                quantity,
-            } = req.body;
-            const cart = await Cart.findByIdAndUpdate(req.params.id);
+            const { quantity } = req.body;
+            const cart = await Cart.findById(req.params.id);
 
             if (!cart) {
-                return res.status(404).json({ message: "No cart found with this id" })
+                return res.status(404).json({ message: "No cart found with this id" });
             }
 
-            await cart.update({
-                quantity,
+            await Cart.updateOne({ _id: cart._id }, { quantity });
+
+            res.status(200).json({
+                success: true,
+                message: "Cart item updated",
             });
 
         } catch (error) {
+            console.log(error)
             res.status(500).json({ message: error });
         }
     },
     // get Cart Data
     GetCartData: async (req, res) => {
         try {
-            const cartData = await Cart.find({ userId: req.user.id });
+            const cartData = await Cart.find({ user: req.user.id });
             res.status(200).json({
                 success: true,
                 cartData,
@@ -139,18 +139,19 @@ const controller = {
         try {
             const cartData = await Cart.findById(req.params.id);
 
-  if (!cartData) {
-    return res.status(400).json({message:"Items is not found with this id"})
-  }
+            if (!cartData) {
+                return res.status(400).json({ message: "Items is not found with this id" })
+            }
 
-  await cartData.remove();
+            await Cart.deleteOne({ _id: req.params.id, user: req.user._id })
 
-  res.status(200).json({
-    success: true,
-    message: "Item removed from cart",
-  });
+            res.status(200).json({
+                success: true,
+                message: "Item removed from cart",
+            });
 
         } catch (error) {
+            console.log(error)
             res.status(500).json({ message: error });
         }
     },
