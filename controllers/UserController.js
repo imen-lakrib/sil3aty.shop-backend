@@ -102,7 +102,7 @@ var controller = {
             res.status(200).json(user);
         } catch (error) {
             console.log(error);
-            res.status(500).json({ message: "Internal server error" });
+            res.status(500).json({ message: error });
         }
 
 
@@ -231,16 +231,15 @@ var controller = {
                 return res.status(404).json({ message: "User not found" });
             }
 
-            user.name = req.body.name || user.name;
+            user.username = req.body.username || user.username;
             user.email = req.body.email || user.email;
-            user.role = req.body.role || user.role;
 
             const updatedUser = await user.save();
 
             res.status(200).json(updatedUser);
         } catch (error) {
             console.error(error.message);
-            res.status(500).send("Server Error");
+            res.status(500).send(error.message);
         }
     },
     EditMyProfile: async (req, res) => {
@@ -251,7 +250,7 @@ var controller = {
                 return res.status(404).json({ message: "User not found" });
             }
 
-            user.name = req.body.name || user.name;
+            user.username = req.body.username || user.username;
             user.email = req.body.email || user.email;
 
             const updatedUser = await user.save();
@@ -259,7 +258,7 @@ var controller = {
             res.status(200).json(updatedUser);
         } catch (error) {
             console.error(error.message);
-            res.status(500).send("Server Error");
+            res.status(500).send(error.message);
         }
     },
     ChangeRole:async(req,res)=>{
@@ -277,7 +276,7 @@ var controller = {
             
         } catch (error) {
             console.error(error.message);
-            res.status(500).send("Server Error");
+            res.status(500).send(error.message);
             
         }
     }

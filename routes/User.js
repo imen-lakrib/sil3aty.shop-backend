@@ -11,7 +11,7 @@ const router = express.Router()
 
 router.post('/register', UserController.registerUser)
 router.get('/login', UserController.loginUser)
-router.get('/profile', UserController.GetUser)
+router.get('/profile/:id', UserController.GetUser)
 router.get('/allusers', protectAdmin, UserController.GetAllUsers)
 router.get('/logout',protectAllUsers, UserController.LogoutUser)
 router.delete('/:id',protectAdmin, UserController.DeleteUser)

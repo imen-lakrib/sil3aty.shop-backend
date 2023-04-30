@@ -12,5 +12,13 @@ router.post('/new',protectAgent, ProductController.CreateProduct)
 router.put('/:id',protectAgent, ProductController.EditProduct)
 router.delete('/:id',protectAdmin, ProductController.DeleteProduct)
 
+// product review routes
+router.post('/review/add',protectClient, ProductController.AddReview)
+router.get('/review', ProductController.GetSingleProductReview)
+router.delete('/review/delete',protectAdmin, ProductController.DeleteUserReview)
+
+
+
+
 
 export default router;

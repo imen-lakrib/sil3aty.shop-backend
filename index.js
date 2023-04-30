@@ -25,7 +25,7 @@ app.use((err, req, res, next) => {
       res.status(400).json({ message: 'Invalid ID' });
     } else {
       // Handle other errors
-      res.status(500).send('Internal Server Error');
+      res.status(500).send(' Server Error Intr');
     }
   });
 
