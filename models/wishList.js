@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const WichListSchema = mongoose.Schema({
+const WishListSchema = mongoose.Schema({
     productName: {
         type: String,
         required: [true, "Please enter your product name"],
@@ -32,6 +32,6 @@ const WichListSchema = mongoose.Schema({
     
 }) 
 
-const WichList = mongoose.model('WichList', WichListSchema);
+const WishList = mongoose.model('WishList', WishListSchema);
 
-export default WichList;
+export default WishList;
