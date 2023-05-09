@@ -8,7 +8,8 @@ const router = express.Router()
 
 router.get('/allProducts', ProductController.GetProducts)
 router.get('/:id', ProductController.GetSingleProduct)
-router.post('/new',protectAgent, ProductController.CreateProduct)
+router.post('/new',protectAdmin, ProductController.CreateProduct)
+
 router.put('/:id',protectAgent, ProductController.EditProduct)
 router.delete('/:id',protectAdmin, ProductController.DeleteProduct)
 

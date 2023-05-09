@@ -28,17 +28,22 @@ const controller = {
 
     CreateProduct: async (req, res) => {
         try {
-            if (!req.body.name || !req.body.description || !req.body.price) {
-                return res.status(422).json({ message: "Please provide all required fields." });
-            }
-            const newProduct = await Product.create(req.body)
-            res.status(200).json({ newProduct })
-
+          console.log('Request body:', req.body);
+      
+          if (!req.body.name || !req.body.description || !req.body.price) {
+            console.log('Required fields are missing');
+            return res.status(422).json({ message: "Please provide all required fields." });
+          }
+      
+          const newProduct = await Product.create(req.body);
+          console.log('New product:', newProduct);
+      
+          res.status(200).json({ newProduct });
         } catch (error) {
-            console.log(error)
-            res.sendStatus(500)
+          console.log('Error:', error);
+          res.sendStatus(500);
         }
-    },
+      },
     EditProduct: async (req, res) => {
         try {
             let currentProduct = await Product.findById(req.params.id)
