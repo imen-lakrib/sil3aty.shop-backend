@@ -83,7 +83,7 @@ const controller = {
 
     GetSingleProduct: async (req, res) => {
         try {
-            const currentProduct = await Product.findById(req.query.productId);
+            const currentProduct = await Product.findById(req.params.productId);
             
             if (!currentProduct) {
                 return res.status(404).json({ message: "This product is not found" });

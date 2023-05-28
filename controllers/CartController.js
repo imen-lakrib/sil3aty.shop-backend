@@ -72,33 +72,52 @@ const controller = {
     // add To Cart
     AddToCart: async (req, res) => {
         try {
-            const {
-                productName,
-                quantity,
-                productImage,
-                productPrice,
-                productId,
-                Stock,
-            } = req.body;
-            const cart = await Cart.create({
-                productName,
-                quantity,
-                productImage,
-                productPrice,
-                productId,
-                user: req.user._id,
-                Stock,
-            });
-
+          const {
+            productName,
+            quantity,
+            productImage,
+            productPrice,
+            productId,
+            Stock,
+          } = req.body;
+      
+          // Check if the product already exists in the cart
+          const existingCartItem = await Cart.findOne({
+            productId: productId,
+            user: req.user._id,
+          });
+      
+          if (existingCartItem) {
+            // If the product exists, increase its quantity by 1
+            existingCartItem.quantity += 1;
+            await existingCartItem.save();
+      
             res.status(200).json({
-                success: true,
-                cart,
+              success: true,
+              cart: existingCartItem,
             });
+          } else {
+            // If the product does not exist, create a new cart item
+            const cart = await Cart.create({
 
+              productName,
+              quantity,
+              productImage,
+              productPrice,
+              productId,
+              user: req.user._id,
+              Stock,
+            });
+      
+            res.status(200).json({
+              success: true,
+              cart,
+            });
+          }
         } catch (error) {
-            res.status(500).json({ message: error });
+          res.status(500).json({ message: error });
         }
-    },
+      },
     // update Cart
     UpdateCart: async (req, res) => {
         try {
@@ -126,8 +145,7 @@ const controller = {
         try {
             const cartData = await Cart.find({ user: req.user.id });
             res.status(200).json({
-                success: true,
-                cartData,
+                data:cartData
             });
 
         } catch (error) {

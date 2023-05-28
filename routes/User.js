@@ -18,7 +18,8 @@ router.delete('/:id',protectAdmin, UserController.DeleteUser)
 router.post('/forgot-password', UserController.ForgotPassword);
 router.get('/reset-password/:token', UserController.ResetPassword);
 router.post('/reset-password/:token', UserController.SubmitResetPassword);
-router.put('/edit',protectClient, UserController.EditMyProfile)
+router.put('/edit/:userId', protectClient, UserController.EditMyProfile);
+
 router.put('/adminedit/:id',protectAdmin, UserController.EditProfileByAdmin)
 router.put('/changerole/:id', protectAdmin, UserController.ChangeRole)
 

@@ -7,7 +7,7 @@ const router = express.Router()
 
 
 router.get('/allProducts', ProductController.GetProducts)
-router.get('/:id', ProductController.GetSingleProduct)
+router.get('/:productId', ProductController.GetSingleProduct)
 router.post('/new',protectAdmin, ProductController.CreateProduct)
 
 router.put('/:id',protectAgent, ProductController.EditProduct)
