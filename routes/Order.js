@@ -4,10 +4,13 @@ import { protectAdmin, protectAllUsers, protectClient, protectAgent } from "../m
 
 const router = express.Router()
 
+// client routes:
 router.get('/:id', protectClient, OrderController.GetSingleOrder)
 router.post('/mine', protectClient, OrderController.GetAllOfMyOrders)
 router.post('/add', protectClient, OrderController.CreateOrder)
 
+
+// admin routes:
 router.delete('/delete/:id', protectAdmin, OrderController.DeleteOrder)
 router.put('/orderstatus/:id', protectAdmin, OrderController.UpdateOrderStatus)
 router.put('/all', protectAdmin, OrderController.AdminGetAllOrders)

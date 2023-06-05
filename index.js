@@ -11,6 +11,7 @@ import ProductRoute from './routes/Product.js'
 import UserRoute from './routes/User.js'
 import OrderRoute from './routes/Order.js'
 import WishList from './routes/WishList.js'
+import CategoryRoute from './routes/Category.js'
 dotenv.config();
 connectDb()
 
@@ -45,6 +46,7 @@ app.use('/products',ProductRoute)
 app.use('/user',UserRoute)
 app.use('/order',OrderRoute)
 app.use('/cart',WishList)
+app.use('/categories',CategoryRoute)
 
 
 

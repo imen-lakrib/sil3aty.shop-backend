@@ -10,7 +10,6 @@ const controller = {
                 productImage,
                 productPrice,
                 productId,
-                Stock,
             } = req.body;
             const wishList = await WishList.create({
                 productName,
@@ -19,7 +18,6 @@ const controller = {
                 productPrice,
                 user: req.user._id,
                 productId,
-                Stock,
             });
 
             res.status(200).json({
@@ -72,52 +70,52 @@ const controller = {
     // add To Cart
     AddToCart: async (req, res) => {
         try {
-          const {
-            productName,
-            quantity,
-            productImage,
-            productPrice,
-            productId,
-            Stock,
-          } = req.body;
-      
-          // Check if the product already exists in the cart
-          const existingCartItem = await Cart.findOne({
-            productId: productId,
-            user: req.user._id,
-          });
-      
-          if (existingCartItem) {
-            // If the product exists, increase its quantity by 1
-            existingCartItem.quantity += 1;
-            await existingCartItem.save();
-      
-            res.status(200).json({
-              success: true,
-              cart: existingCartItem,
-            });
-          } else {
-            // If the product does not exist, create a new cart item
-            const cart = await Cart.create({
+            const {
+                productName,
+                quantity,
+                productImage,
+                productPrice,
+                productId,
+                Stock,
+            } = req.body;
 
-              productName,
-              quantity,
-              productImage,
-              productPrice,
-              productId,
-              user: req.user._id,
-              Stock,
+            // Check if the product already exists in the cart
+            const existingCartItem = await Cart.findOne({
+                productId: productId,
+                user: req.user._id,
             });
-      
-            res.status(200).json({
-              success: true,
-              cart,
-            });
-          }
+
+            if (existingCartItem) {
+                // If the product exists, increase its quantity by 1
+                existingCartItem.quantity += 1;
+                await existingCartItem.save();
+
+                res.status(200).json({
+                    success: true,
+                    cart: existingCartItem,
+                });
+            } else {
+                // If the product does not exist, create a new cart item
+                const cart = await Cart.create({
+
+                    productName,
+                    quantity,
+                    productImage,
+                    productPrice,
+                    productId,
+                    user: req.user._id,
+                    Stock,
+                });
+
+                res.status(200).json({
+                    success: true,
+                    cart,
+                });
+            }
         } catch (error) {
-          res.status(500).json({ message: error });
+            res.status(500).json({ message: error });
         }
-      },
+    },
     // update Cart
     UpdateCart: async (req, res) => {
         try {
@@ -128,7 +126,12 @@ const controller = {
                 return res.status(404).json({ message: "No cart found with this id" });
             }
 
-            await Cart.updateOne({ _id: cart._id }, { quantity });
+            const isUpdated = await Cart.updateOne({ _id: cart._id }, { quantity });
+            if (!isUpdated) {
+                res.status(400).json({
+                    success: false, message: "Cart item not updated",
+                })
+            }
 
             res.status(200).json({
                 success: true,
@@ -145,7 +148,7 @@ const controller = {
         try {
             const cartData = await Cart.find({ user: req.user.id });
             res.status(200).json({
-                data:cartData
+                cartData
             });
 
         } catch (error) {
@@ -167,6 +170,29 @@ const controller = {
                 success: true,
                 message: "Item removed from cart",
             });
+
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({ message: error });
+        }
+    },
+    DeleteAll: async (req, res) => {
+        try {
+            // Find all cart data for the user
+            const cartData = await Cart.find({ user: req.user._id });
+
+            if (!cartData) {
+                return res.status(400).json({ message: "No cart data found for the user" });
+            }
+
+            // Delete all cart data for the user
+            await Cart.deleteMany({ user: req.user._id });
+
+            res.status(200).json({
+                success: true,
+                message: "All cart data removed",
+            });
+
 
         } catch (error) {
             console.log(error)

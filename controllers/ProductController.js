@@ -1,7 +1,7 @@
 
 import Product from "../models/product.js";
 import Features from "../utils/Features.js";
-
+import Category from "../models/category.js";
 const controller = {
     GetProducts: async (req, res) => {
         const features = Features(Product, req.query);
@@ -9,14 +9,14 @@ const controller = {
             const searchResults = await features.search();
             const filteredResults = await features.filter();
             const paginatedResults = await features.paginate(filteredResults.filter((product) => searchResults.map((product) => product._id.toString()).includes(product._id.toString())));
-          
+
             if (paginatedResults.results.length === 0) {
-              return res.status(404).json({ message: "No products found" });
+                return res.status(404).json({ message: "No products found" });
             }
-          
+
             res.status(200).json({
-              products: paginatedResults.results,
-              pagination: paginatedResults.pagination,
+                products: paginatedResults.results,
+                pagination: paginatedResults.pagination,
             });
         } catch (error) {
             console.log(error);
@@ -28,22 +28,20 @@ const controller = {
 
     CreateProduct: async (req, res) => {
         try {
-          console.log('Request body:', req.body);
-      
-          if (!req.body.name || !req.body.description || !req.body.price) {
-            console.log('Required fields are missing');
-            return res.status(422).json({ message: "Please provide all required fields." });
-          }
-      
-          const newProduct = await Product.create(req.body);
-          console.log('New product:', newProduct);
-      
-          res.status(200).json({ newProduct });
+
+            if (!req.body.name || !req.body.description || !req.body.price) {
+                console.log('Required fields are missing');
+                return res.status(422).json({ message: "Please provide all required fields." });
+            }
+
+            const newProduct = await Product.create(req.body);
+
+            res.status(200).json({ newProduct });
         } catch (error) {
-          console.log('Error:', error);
-          res.sendStatus(500);
+            console.log('Error:', error);
+            res.sendStatus(500);
         }
-      },
+    },
     EditProduct: async (req, res) => {
         try {
             let currentProduct = await Product.findById(req.params.id)
@@ -84,7 +82,7 @@ const controller = {
     GetSingleProduct: async (req, res) => {
         try {
             const currentProduct = await Product.findById(req.params.productId);
-            
+
             if (!currentProduct) {
                 return res.status(404).json({ message: "This product is not found" });
             }
@@ -100,8 +98,8 @@ const controller = {
 
 
     // product review :
-     // Delete Client Review --Admin -- Agent id
-     DeleteUserReview: async (req, res) => {
+    // Delete Client Review --Admin -- Agent id
+    DeleteUserReview: async (req, res) => {
         try {
             const product = await Product.findById(req.query.productId);
             if (!product) {
@@ -154,7 +152,7 @@ const controller = {
         }
     },
 
-    
+
 
 
     // Get Single Product Review :id
@@ -236,6 +234,47 @@ const controller = {
             res.status(500).send("Server Error");
         }
     },
+    AddProductCategory: async (req, res) => {
+        try {
+            if (!req.body.categoryName) {
+                return res.status(422).json({ message: "Please provide all required fields." });
+            }
+            const newCategory = await Category.create(req.body)
+            res.status(200).json({ newCategory });
+
+
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).send("Server Error");
+        }
+    },
+    DeleteProductCategory: async (req, res) => {
+        try {
+            const currentCategory = await Category.findById(req.params.id)
+            if (!currentCategory) {
+                return res.status(422).json({ message: "category not found" });
+            }
+            await Category.deleteOne({ _id: req.params.id });
+            res.status(200).json({ message: "This categort has been removed" });
+
+
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).send("Server Error");
+        }
+    },
+    GetAllCategories: async (req, res) => {
+        try {
+          const categories = await Category.find();
+          if (!categories) {
+            return res.status(404).json({ message: 'No categories found' });
+          }
+          res.status(200).json(categories);
+        } catch (error) {
+          console.error("Error retrieving categories:", error);
+          res.status(500).send("Server Error");
+        }
+      }
 
 
 

@@ -18,6 +18,11 @@ router.post('/review/add',protectClient, ProductController.AddReview)
 router.get('/review', ProductController.GetSingleProductReview)
 router.delete('/review/delete',protectAdmin, ProductController.DeleteUserReview)
 
+// categories routes
+router.get('/categories', ProductController.GetAllCategories)
+router.post('/category/add',protectAdmin, ProductController.AddProductCategory)
+router.delete('/category/delete/:id',protectAdmin, ProductController.DeleteProductCategory)
+
 
 
 

@@ -23,7 +23,6 @@ const controller = {
             const {
                 shippingInfo,
                 orderItems,
-                paymentInfo,
                 itemsPrice,
                 taxPrice,
                 shippingPrice,
@@ -34,7 +33,6 @@ const controller = {
             const newOrder = await Order.create({
                 shippingInfo,
                 orderItems,
-                paymentInfo,
                 itemsPrice,
                 taxPrice,
                 shippingPrice,
