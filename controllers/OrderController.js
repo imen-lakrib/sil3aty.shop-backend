@@ -39,6 +39,7 @@ const controller = {
                 totalPrice,
                 paidAt: Date.now(),
                 user: req.user._id,
+                
                 orderStatus
                 
             });

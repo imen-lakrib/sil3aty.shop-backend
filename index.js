@@ -12,6 +12,9 @@ import UserRoute from './routes/User.js'
 import OrderRoute from './routes/Order.js'
 import WishList from './routes/WishList.js'
 import CategoryRoute from './routes/Category.js'
+import ColorRoute from './routes/Color.js'
+import SizeRoute from './routes/Size.js'
+
 dotenv.config();
 connectDb()
 
@@ -47,6 +50,8 @@ app.use('/user',UserRoute)
 app.use('/order',OrderRoute)
 app.use('/cart',WishList)
 app.use('/categories',CategoryRoute)
+app.use('/colors',ColorRoute)
+app.use('/sizes',SizeRoute)
 
 
 

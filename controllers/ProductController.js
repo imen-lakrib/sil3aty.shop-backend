@@ -184,25 +184,29 @@ const controller = {
     // Add A Review -- Client  -- userId productId
     // each user can add only one review for a product that is already purchased
     // if he tryed to add another review the second one will overide the existing
-    AddReview: async (req, res) => {
+    AddReview : async (req, res) => {
         try {
-            const { rating, comment, productId } = req.query
+            const { rating, comment, productId } = req.query;
 
-            console.log(req.user)
+            console.log(req.user);
 
             const review = {
                 user: req.user._id,
                 name: req.user.name,
                 rating: Number(rating),
-                comment
-            }
-            // get the product :
-            const product = await Product.findById(productId)
+                comment,
+            };
+
+            // Get the product
+            const product = await Product.findById(productId);
             if (!product) {
-                res.status(400).send("this product is not available");
+                return res.status(400).send("This product is not available");
             }
-            // only one review: 
-            const existingReview = product.reviews.find((review) => review.user.toString() === req.user._id.toString());
+
+            // Only one review
+            const existingReview = product.reviews.find(
+                (review) => review.user.toString() === req.user._id.toString()
+            );
             if (existingReview) {
                 existingReview.rating = rating;
                 existingReview.comment = comment;
@@ -212,10 +216,7 @@ const controller = {
 
             product.numberOfReviews = product.reviews.length;
 
-            //
-
             let avg = 0;
-
             product.reviews.forEach((rev) => {
                 avg += rev.rating;
             });
@@ -226,55 +227,16 @@ const controller = {
 
             res.status(200).json({
                 success: true,
-                product
-
+                product,
             });
         } catch (error) {
             console.error(error.message);
             res.status(500).send("Server Error");
         }
-    },
-    AddProductCategory: async (req, res) => {
-        try {
-            if (!req.body.categoryName) {
-                return res.status(422).json({ message: "Please provide all required fields." });
-            }
-            const newCategory = await Category.create(req.body)
-            res.status(200).json({ newCategory });
+    
+    }
 
 
-        } catch (error) {
-            console.error(error.message);
-            res.status(500).send("Server Error");
-        }
-    },
-    DeleteProductCategory: async (req, res) => {
-        try {
-            const currentCategory = await Category.findById(req.params.id)
-            if (!currentCategory) {
-                return res.status(422).json({ message: "category not found" });
-            }
-            await Category.deleteOne({ _id: req.params.id });
-            res.status(200).json({ message: "This categort has been removed" });
-
-
-        } catch (error) {
-            console.error(error.message);
-            res.status(500).send("Server Error");
-        }
-    },
-    GetAllCategories: async (req, res) => {
-        try {
-          const categories = await Category.find();
-          if (!categories) {
-            return res.status(404).json({ message: 'No categories found' });
-          }
-          res.status(200).json(categories);
-        } catch (error) {
-          console.error("Error retrieving categories:", error);
-          res.status(500).send("Server Error");
-        }
-      }
 
 
 
