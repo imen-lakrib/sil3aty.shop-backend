@@ -146,15 +146,14 @@ const controller = {
     // get Cart Data
     GetCartData: async (req, res) => {
         try {
-            const cartData = await Cart.find({ user: req.user.id });
-            res.status(200).json({
-                cartData
-            });
-
+          const cartData = await Cart.find({ user: req.user.id });
+          res.status(200).json({
+            cartData
+          });
         } catch (error) {
-            res.status(500).json({ message: error });
+          res.status(500).json({ message: error });
         }
-    },
+      },
     // remove Cart Data
     DeleteCartData: async (req, res) => {
         try {
