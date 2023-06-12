@@ -38,7 +38,7 @@ app.use(express.urlencoded({extended:false}))
 
 app.use(cors());
 // Get the directory name using import.meta.url
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
+// const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
 // Use the directory name to set up the static files middleware
 app.use(express.static(path.join(__dirname, "public"), { dotfiles: "allow" }));
