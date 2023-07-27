@@ -18,19 +18,21 @@ import SizeRoute from './routes/Size.js'
 dotenv.config();
 connectDb()
 
+
+
 const PORT = process.env.PORT || 5000 
 
 const app = express();
 
-app.use((err, req, res, next) => {
-    if (err.name === 'CastError') {
-      // Handle CastError
-      res.status(400).json({ message: 'Invalid ID' });
-    } else {
-      // Handle other errors
-      res.status(500).send(' Server Error Intr');
-    }
-  });
+// app.use((err, req, res, next) => {
+//     if (err.name === 'CastError') {
+//       // Handle CastError
+//       res.status(400).json({ message: 'Invalid ID' });
+//     } else {
+//       // Handle other errors
+//       res.status(500).send(' Server Error Intr');
+//     }
+//   });
 
 // read the body 
 app.use(express.json())
