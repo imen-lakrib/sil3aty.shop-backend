@@ -24,15 +24,7 @@ const PORT = process.env.PORT || 5000
 
 const app = express();
 
-// app.use((err, req, res, next) => {
-//     if (err.name === 'CastError') {
-//       // Handle CastError
-//       res.status(400).json({ message: 'Invalid ID' });
-//     } else {
-//       // Handle other errors
-//       res.status(500).send(' Server Error Intr');
-//     }
-//   });
+
 
 // read the body 
 app.use(express.json())
@@ -46,6 +38,8 @@ const __dirname = path.dirname(new URL(import.meta.url).pathname);
 app.use(express.static(path.join(__dirname, "public"), { dotfiles: "allow" }));
 
 
+
+
 // create routes:
 app.use('/products',ProductRoute)
 app.use('/user',UserRoute)
@@ -57,7 +51,9 @@ app.use('/sizes',SizeRoute)
 
 
 
-
+app.use("/test",(req,res)=>{
+  res.send("hello world")
+})
 
 
 app.listen(PORT, ()=> console.log(`listening on port : ${PORT}`));
