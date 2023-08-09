@@ -40,7 +40,7 @@ const protectAdmin = async(req, res, next) =>{
     }
     if (!token){
         console.log('No token found')
-        res.status(401).json({message: 'not authorized, no token'})
+        return res.status(401).json({ message: 'not authorized, no token' });
     }
 }
 
@@ -85,7 +85,7 @@ const protectClient = async(req, res, next) =>{
     }
     if (!token){
         console.log('No token found')
-        res.status(401).json({message: 'not authorized, no token'})
+        return res.status(401).json({ message: 'not authorized, no token' });
     }
 }
 
@@ -118,7 +118,7 @@ const protectAgent = async (req, res, next) => {
         }
     }
     if (!token) {
-        res.status(401).json({ message: 'not authorized, no token' })
+        return res.status(401).json({ message: 'not authorized, no token' });
 
     }
 
@@ -149,7 +149,7 @@ const protectAllUsers = async (req, res, next) => {
         }
     }
     if (!token) {
-        res.status(401).json({ message: 'not authorized, no token' })
+        return res.status(401).json({ message: 'not authorized, no token' });
 
     }
 
